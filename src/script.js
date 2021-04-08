@@ -142,6 +142,10 @@ camera.position.y = 3
 camera.position.z = 3
 scene.add(camera)
 
+window.addEventListener('click', () => {
+    console.log(camera.position)
+})
+
 // Controls
 const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true

@@ -21,7 +21,7 @@ const scene = new THREE.Scene()
  * Galaxy
  */
 const parameters = {}
-parameters.count = 200000
+parameters.count = 170 * 40
 parameters.size = 0.005
 parameters.radius = 5
 parameters.branches = 3
@@ -47,56 +47,42 @@ const generateGalaxy = () => {
      */
     geometry = new THREE.BufferGeometry()
 
-    const positions = new Float32Array(parameters.count * 3)
-    const randomness = new Float32Array(parameters.count * 3)
+    const positions = new Float32Array(170 * 40 * 3)
     const colors = new Float32Array(parameters.count * 3)
-    const scales = new Float32Array(parameters.count * 1)
 
-    const insideColor = new THREE.Color(parameters.insideColor)
-    const outsideColor = new THREE.Color(parameters.outsideColor)
+    for (let i = 0; i < 170; i++) {
+        for (let j = 0; j < 40; j++) {
+            const i3 = i * j * 3
 
-    for (let i = 0; i < parameters.count; i++) {
-        const i3 = i * 3
+            // Position
+            const radius = Math.random() * parameters.radius
 
-        // Position
-        const radius = Math.random() * parameters.radius
+            if (i < 85) {
+                positions[i3] = 4 * Math.pow(Math.sin(i / 85.0 * Math.PI), 2) + 0.1 * Math.sin(6.0 * i / 17 * Math.PI)
+                positions[i3 + 1] = 4 * Math.cos(i / 85.0 * Math.PI) + 0.1 * Math.cos(6.0 * i / 17.0 * Math.PI)
+                positions[i3 + 2] = 7 * Math.cos(i / 85.0 * Math.PI) + 15 * Math.sin((j - 20.0) / 40.0 * Math.PI)
+            } else {
+                positions[i3] = -4 * Math.pow(Math.sin((i - 85 / 85) / Math.PI), 2) + 0.1 * Math.sin(((6 * (i - 85)) / 17) * Math.PI)
+                positions[i3 + 1] = -4 * Math.cos((i - 85 / 85) / Math.PI) + 0.1 * Math.cos(((6 * (i - 85)) / 17) * Math.PI)
+                positions[i3 + 2] = -7 * Math.cos((i - 85 / 85) / Math.PI) + 15 * Math.sin(((j - 20) / 40) * Math.PI)
+            }
 
-        const branchAngle = (i % parameters.branches) / parameters.branches * Math.PI * 2
+            // Color
+            colors[i3] = 1 - (j / 40.0) // mixedColor.r
+            colors[i3 + 1] = 0 //mixedColor.g
+            colors[i3 + 2] = j / 40.0 // mixedColor.b
 
-        positions[i3] = Math.cos(branchAngle) * radius
-        positions[i3 + 1] = 0.0
-        positions[i3 + 2] = Math.sin(branchAngle) * radius
-
-        // Randomness
-        const randomX = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius
-        const randomY = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius
-        const randomZ = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius
-
-        randomness[i3] = randomX
-        randomness[i3+1] = randomY
-        randomness[i3+2] = randomZ
-
-        // Color
-        const mixedColor = insideColor.clone()
-        mixedColor.lerp(outsideColor, radius / parameters.radius)
-
-        colors[i3] = mixedColor.r
-        colors[i3 + 1] = mixedColor.g
-        colors[i3 + 2] = mixedColor.b
-
-        // Scales
-        scales[i] = Math.random()
+            // Scales
+            // scales[i] = Math.random()
+        }
     }
 
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
-    geometry.setAttribute('aScale', new THREE.BufferAttribute(scales, 1))
-    geometry.setAttribute('aRandom', new THREE.BufferAttribute(randomness, 3))
 
     /**
      * Material
      */
-
 
     material = new THREE.ShaderMaterial({
         depthWrite: false,
@@ -180,7 +166,7 @@ const tick = () => {
     const elapsedTime = clock.getElapsedTime()
 
     // Update material
-    material.uniforms.uTime.value = elapsedTime
+    // material.uniforms.uTime.value = elapsedTime
 
     // Update controls
     controls.update()
